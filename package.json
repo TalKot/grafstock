@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/TalKot/grafstock#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "request": "^2.88.2",
+    "scramjet": "^4.35.10"
   }
 }
