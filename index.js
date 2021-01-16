@@ -7,16 +7,29 @@ const arkCSV = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_INNO
 
 const app = express()
 
-app.get('/', (req, res) => {
-  // let data = await request.get(arkCSV);
-  let data = [];
+app.get('/', async (req, res) => {
+  
+    let data = [];
+    
+    await request.get(arkCSV)  // fetch csv
+    .pipe(new StringStream())  // pass to stream
+    .CSVParse()                // parse into objects
+    .consume(object => {
+      data.push(object);
+    })
 
-  request.get(arkCSV)   // fetch csv
-  .pipe(new StringStream())                       // pass to stream
-  .CSVParse()                                   // parse into objects
-  .consume(object => data.push(object))  // do whatever you like with the objects
-  .then(() => res.json(data))
-  .catch(err => console.error(err))
+    let colums = data.shift();
+    
+    let finalData = data.map(row => {
+
+      return row.reduce(function(result, field, index) {
+        result[colums[index]] = row[index];
+        return result;
+      }, 
+      {})
+    });
+
+    res.json(finalData) 
 })
 
 console.log("server starting..");

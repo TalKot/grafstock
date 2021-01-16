@@ -1,6 +1,6 @@
 branch-defaults:
   main:
-    environment: grafstock-dev
+    environment: null
     group_suffix: null
 global:
   application_name: grafstock
@@ -18,4 +18,4 @@ global:
   workspace_type: Application
 option_settings:
   aws:elasticbeanstalk:container:nodejs:
-    NodeCommand: "npm run start"
+    NodeCommand: npm run start
