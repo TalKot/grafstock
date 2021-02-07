@@ -2,7 +2,7 @@ const express = require('express')
 const request = require("request");
 const axios = require("axios");
 const { StringStream } = require("scramjet");
-var fs = require('fs');
+const fs = require('fs');
 
 const port = 8080
 const arkCSVdataUrl1 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_INNOVATION_ETF_ARKK_HOLDINGS.csv"
@@ -10,10 +10,6 @@ const arkCSVdataUrl2 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/
 const arkCSVdataUrl3 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_NEXT_GENERATION_INTERNET_ETF_ARKW_HOLDINGS.csv"
 const arkCSVdataUrl4 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_GENOMIC_REVOLUTION_MULTISECTOR_ETF_ARKG_HOLDINGS.csv"
 const arkCSVdataUrl5 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_FINTECH_INNOVATION_ETF_ARKF_HOLDINGS.csv"
-
-// const config = require("./config.json")
-// const token = process.env.IEXAPI_TOKEN || config.iexapis;
-const token = process.env.IEXAPI_TOKEN || "";
 
 const app = express()
 
@@ -50,7 +46,7 @@ function parseData(data){
   return finalData;
 }
 
-const fetchData = async (stockName) => {
+const fetchData = async (stockName, token) => {
   try {
       const resp = await axios.get(`https://cloud.iexapis.com/stable/stock/${stockName}/indicator/rsi?range=30d&input1=15&token=${token}&chartCloseOnly=true`);
       return {[stockName]: resp.data};
@@ -64,10 +60,10 @@ const fetchData = async (stockName) => {
   }
 };
 
-async function getRsiData(parsedData){
+async function getRsiData(parsedData, token){
   const stocksNames = Object.keys(parsedData);
   let pro = stocksNames.map(async stocksName => {
-    return await fetchData(stocksName);
+    return await fetchData(stocksName, token);
   });
 
   const rawData = await Promise.all([...pro]);
@@ -91,8 +87,22 @@ function getLocalData(){
   }
 }
 
+function getIeToken(){
+  try{
+    if (process.env.IEXAPI_TOKEN) return process.env.IEXAPI_TOKEN;
+ 
+    const dataFile = fs.readFileSync('./config.json', {encoding:'utf8'}); 
+    return JSON.parse(dataFile).iexapis;
+  }catch(e){
+    console.error(e)
+  }
+}
+
+
 app.get('/', async (req, res) => {
   
+  const token = getIeToken();
+
   const localData = getLocalData()
   if (localData){
     res.json(localData);
@@ -108,7 +118,7 @@ app.get('/', async (req, res) => {
   ]);
   
   const parsedData = parseData(csvRawdata);
-  const RSidata = await getRsiData(parsedData);
+  const RSidata = await getRsiData(parsedData, token);
   
   const mergedData = Object.keys(parsedData).map(stock=>{
     const data = {};
