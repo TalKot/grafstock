@@ -1,6 +1,7 @@
 const express = require('express')
 const request = require("request");
 const axios = require("axios");
+const config = require("./config.json")
 
 const {
   StringStream
@@ -13,8 +14,7 @@ const arkCSVdataUrl3 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/
 const arkCSVdataUrl4 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_GENOMIC_REVOLUTION_MULTISECTOR_ETF_ARKG_HOLDINGS.csv"
 const arkCSVdataUrl5 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_FINTECH_INNOVATION_ETF_ARKF_HOLDINGS.csv"
 
-const token = process.env.IEXAPI_TOKEN || "";
-
+const token = process.env.IEXAPI_TOKEN || config.iexapis;
 
 const app = express()
 
