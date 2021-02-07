@@ -1,7 +1,6 @@
 const express = require('express')
 const request = require("request");
 const axios = require("axios");
-const config = require("./config.json")
 const { StringStream } = require("scramjet");
 
 const port = 8080
@@ -11,7 +10,9 @@ const arkCSVdataUrl3 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/
 const arkCSVdataUrl4 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_GENOMIC_REVOLUTION_MULTISECTOR_ETF_ARKG_HOLDINGS.csv"
 const arkCSVdataUrl5 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_FINTECH_INNOVATION_ETF_ARKF_HOLDINGS.csv"
 
-const token = process.env.IEXAPI_TOKEN || config.iexapis;
+// const config = require("./config.json")
+// const token = process.env.IEXAPI_TOKEN || config.iexapis;
+const token = process.env.IEXAPI_TOKEN || "";
 
 const app = express()
 
@@ -44,6 +45,7 @@ function parseData(data){
       // console.log(finalData);
     })
   });
+
   return finalData;
 }
 
