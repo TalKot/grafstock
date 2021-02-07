@@ -2,6 +2,7 @@ const express = require('express')
 const request = require("request");
 const axios = require("axios");
 const { StringStream } = require("scramjet");
+var fs = require('fs');
 
 const port = 8080
 const arkCSVdataUrl1 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_INNOVATION_ETF_ARKK_HOLDINGS.csv"
@@ -55,7 +56,11 @@ const fetchData = async (stockName) => {
       return {[stockName]: resp.data};
   } catch (err) {
       // Handle Error Here
-      console.error(err);
+      console.error({
+        stockName,
+        stack: err.stack,
+        message: err.message
+       });
   }
 };
 
@@ -77,7 +82,22 @@ async function getRsiData(parsedData){
   return formatedData;
 }
 
+function getLocalData(){
+  try{
+    const dataFile = fs.readFileSync('./data.json', {encoding:'utf8'}); 
+    return dataFile ? JSON.parse(dataFile) : null;
+  }catch(e){
+    console.error(e)
+  }
+}
+
 app.get('/', async (req, res) => {
+  
+  const localData = getLocalData()
+  if (localData){
+    res.json(localData);
+    return
+  }
 
   let csvRawdata = await Promise.all([
     getArkCSVData(arkCSVdataUrl1),
@@ -98,6 +118,12 @@ app.get('/', async (req, res) => {
     data[stock].push(v)
     data[stock].push(t)
     return data;
+  });
+
+  fs.writeFileSync("data.json", JSON.stringify(mergedData), function(err) {
+    if (err) {
+        console.log(err);
+    }
   });
 
   res.json(mergedData);
