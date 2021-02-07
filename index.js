@@ -2,10 +2,7 @@ const express = require('express')
 const request = require("request");
 const axios = require("axios");
 const config = require("./config.json")
-
-const {
-  StringStream
-} = require("scramjet");
+const { StringStream } = require("scramjet");
 
 const port = 8080
 const arkCSVdataUrl1 = "https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_INNOVATION_ETF_ARKK_HOLDINGS.csv"
